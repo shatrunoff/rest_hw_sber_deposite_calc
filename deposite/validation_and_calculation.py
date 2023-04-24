@@ -3,7 +3,6 @@ import calendar
 
 
 
-
 def date_validate(date_value, date_type='%d.%m.%Y') -> tuple:
 
     flag = False
@@ -83,8 +82,16 @@ def rate_validation(rate, thresholds=(1, 8)) -> tuple:
 
 
 
+def round_number(number):
 
-def calculation_of_the_deposit(deposit, rate) -> float:
+    if round(number, 2) == round(number):
+        return round(number)
+    
+    return round(number, 2)
+
+
+
+def calculation_of_the_deposit(deposit, rate):
     
     return deposit * (1 + rate / 1200)
 
@@ -111,7 +118,7 @@ def get_deposite_result(json_data: dict) -> dict:
 
 
     for period in range(periods):
-        deposite_result[get_last_day_of_current_month(deposite_date).strftime('%d.%m.%Y')] = round(calculation_of_the_deposit(amount, rate), 2)
+        deposite_result[get_last_day_of_current_month(deposite_date).strftime('%d.%m.%Y')] = round_number(calculation_of_the_deposit(amount, rate))
         amount = calculation_of_the_deposit(amount, rate)
         deposite_date = get_last_day_of_current_month(deposite_date) + timedelta(days=1)
 
@@ -119,7 +126,20 @@ def get_deposite_result(json_data: dict) -> dict:
 
 
 
-def aggregate_validation_and_calculating(json_data: dict):
+def sorted_dict_by_values(json_result: dict) -> dict:
+    
+    result = {}
+
+    sorted_dict = sorted(json_result.items(), key=lambda x: x[1])
+
+    for key, value in sorted_dict:
+        result[key] = value
+    
+    return result
+
+
+
+def aggregate_validation_and_calculating(json_data: dict) -> tuple:
     
     if all([date_validate(json_data['date'])[0],\
            periods_validate(json_data['periods'])[0],\
