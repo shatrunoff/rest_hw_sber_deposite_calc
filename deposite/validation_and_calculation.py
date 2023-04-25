@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 import calendar
-
+import requests
 
 
 def date_validate(date_value, date_type='%d.%m.%Y') -> tuple:
@@ -97,7 +97,7 @@ def calculation_of_the_deposit(deposit, rate):
 
 
 
-def get_last_day_of_current_month(date_: datetime) -> str:
+def get_last_day_of_current_month(date_) -> datetime:
 
     if isinstance(date_, str):
         date_ = datetime.strptime(date_, '%d.%m.%Y')
@@ -109,6 +109,7 @@ def get_last_day_of_current_month(date_: datetime) -> str:
     
 
 
+
 def get_deposite_result(json_data: dict) -> dict:
 
     deposite_result = {}
@@ -116,26 +117,12 @@ def get_deposite_result(json_data: dict) -> dict:
     periods, deposite_date = json_data['periods'], json_data['date']
     amount, rate = json_data['amount'], json_data['rate']
 
-
     for period in range(periods):
         deposite_result[get_last_day_of_current_month(deposite_date).strftime('%d.%m.%Y')] = round_number(calculation_of_the_deposit(amount, rate))
         amount = calculation_of_the_deposit(amount, rate)
         deposite_date = get_last_day_of_current_month(deposite_date) + timedelta(days=1)
 
     return deposite_result
-
-
-
-def sorted_dict_by_values(json_result: dict) -> dict:
-    
-    result = {}
-
-    sorted_dict = sorted(json_result.items(), key=lambda x: x[1])
-
-    for key, value in sorted_dict:
-        result[key] = value
-    
-    return result
 
 
 
@@ -155,3 +142,11 @@ def aggregate_validation_and_calculating(json_data: dict) -> tuple:
                     rate_validation(json_data['rate'])[1]] if error]
                     
     return False, {'error': error_list}
+
+
+
+def requests_response_to_app(input_data: dict, 
+                             link='http://127.0.0.1:5000/deposite', 
+                             headers={'Content-Type': 'application/json'}):
+    
+    return requests.post(link, json=input_data, headers=headers).json()
