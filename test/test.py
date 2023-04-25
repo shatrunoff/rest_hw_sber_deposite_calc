@@ -1,5 +1,5 @@
 import pytest
-from deposite.validation_and_calculation import *
+from deposite import *
 import datetime
 
 
