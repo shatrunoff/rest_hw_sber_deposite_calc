@@ -5,6 +5,10 @@ import requests
 
 def date_validate(date_value, date_type='%d.%m.%Y') -> tuple:
 
+    '''
+    Возвращает результат валидации поля date в формате (flag, {error: describe})
+    '''
+
     flag = False
     error_dict = {}
 
@@ -27,6 +31,10 @@ def date_validate(date_value, date_type='%d.%m.%Y') -> tuple:
 
 def periods_validate(periods, thresholds=(1, 60)) -> tuple:
 
+    '''
+    Возвращает результат валидации поля periods в формате (flag, {error: describe})
+    '''
+
     flag = False
     error_dict = {}
 
@@ -46,6 +54,10 @@ def periods_validate(periods, thresholds=(1, 60)) -> tuple:
 
 def amount_validation(amount, thresholds=(10000, 3000000)) -> tuple:
     
+    '''
+    Возвращает результат валидации поля amount в формате (flag, {error: describe})
+    '''
+
     flag = False
     error_dict = {}
 
@@ -65,6 +77,10 @@ def amount_validation(amount, thresholds=(10000, 3000000)) -> tuple:
 
 def rate_validation(rate, thresholds=(1, 8)) -> tuple:
     
+    '''
+    Возвращает результат валидации поля rate в формате (flag, {error: describe})
+    '''
+
     flag = False
     error_dict = {}
 
@@ -84,6 +100,10 @@ def rate_validation(rate, thresholds=(1, 8)) -> tuple:
 
 def round_number(number):
 
+    '''
+    Возвращает округленное число до двух знаков; округляет до целого
+    '''
+
     if round(number, 2) == round(number):
         return round(number)
     
@@ -93,11 +113,19 @@ def round_number(number):
 
 def calculation_of_the_deposit(deposit, rate):
     
+    '''
+    Возвращает результат расчета депозита на 1 месяц
+    '''
+
     return deposit * (1 + rate / 1200)
 
 
 
 def get_last_day_of_current_month(date_) -> datetime:
+    
+    '''
+    Возвращает дату последнего дня месяца в формате datetime
+    '''
 
     if isinstance(date_, str):
         date_ = datetime.strptime(date_, '%d.%m.%Y')
@@ -111,6 +139,10 @@ def get_last_day_of_current_month(date_) -> datetime:
 
 
 def get_deposite_result(json_data: dict) -> dict:
+    
+    '''
+    Возвращает результат расчета депозита за весь период
+    '''
 
     deposite_result = {}
 
@@ -127,7 +159,11 @@ def get_deposite_result(json_data: dict) -> dict:
 
 
 def aggregate_validation_and_calculating(json_data: dict) -> tuple:
-    
+        
+    '''
+    Возвращает результат расчета депозита в случае прохождении валидации, иначе возвращает ошибку 
+    '''
+
     if all([date_validate(json_data['date'])[0],\
            periods_validate(json_data['periods'])[0],\
            amount_validation(json_data['amount'])[0],\
@@ -148,5 +184,9 @@ def aggregate_validation_and_calculating(json_data: dict) -> tuple:
 def requests_response_to_app(input_data: dict, 
                              link='http://127.0.0.1:5000/deposite', 
                              headers={'Content-Type': 'application/json'}):
-    
+        
+    '''
+    Возвращает ответ приложения на запрос расчета депозита
+    '''
+
     return requests.post(link, json=input_data, headers=headers).json()
